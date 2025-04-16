@@ -1,0 +1,211 @@
+<?php
+include"connection.php";
+
+
+ if (getenv('HTTP_X_FORWARDED_FOR')) {
+        $pipaddress = getenv('HTTP_X_FORWARDED_FOR');
+        $ipaddress = getenv('REMOTE_ADDR');
+
+    } else {
+        $ipaddress = getenv('REMOTE_ADDR');
+       
+    }
+	
+	?>
+    
+    
+    
+    <?php
+
+    
+	$todays_date = date("l F j, Y");
+	$month_visited = date("F");
+	$year_visited = date("Y");
+	
+?>
+    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://kit.fontawesome.com/a71e118592.js" crossorigin="anonymous"></script>
+
+    <title>Index page/User Login My Library Management System</title>
+</head>
+<body>
+
+
+<div class="LoginHolder">
+    <h1>My Library Management System</h1>
+    <p>Wisdom depends on knowledge, borrow books that develop your intellectual capacity</p><br>
+    <p>CHANGE YOUR TOMORROW THROUGH READING</p><br>
+
+
+    <?php
+
+if (isset($_POST['signup'])) {
+
+$fname = mysqli_real_escape_string($link, $_POST['fname']);
+$email = mysqli_real_escape_string($link, $_POST['email']);
+$account_category = mysqli_real_escape_string($link, $_POST['account_category']);
+
+$password = mysqli_real_escape_string($link,$_POST['password']);
+
+
+$confirm_password = mysqli_real_escape_string($link, $_POST['confirm_password']);
+$date_registered = mysqli_real_escape_string($link, $_POST['date_registered']);
+$ipaddress = mysqli_real_escape_string($link, $_POST['ipaddress']);
+
+if($password=="$confirm_password"){
+
+}
+else
+{
+    die("<div class='failedNotify'>
+    <i class='fa-solid fa-face-frown'></i> Password confirmation doesn't match, try again.
+    </div>");
+}
+
+$password = md5($password);
+
+
+            //We check if this user already exists
+            $dn = mysqli_num_rows(mysqli_query($link, "SELECT user_id FROM users WHERE email='$email' AND recycle='False' "));
+            if($dn==0)
+            {
+            }
+            else
+            {
+                die("<div class='failedNotify'>You already have an account with us, pls Sign In.</div>");
+            }
+
+$SQL = "INSERT INTO users(fname, email, account_category, password, date_registered, ipaddress) VALUE('$fname', '$email', '$account_category', '$password', '$date_registered', '$ipaddress')";
+$result = mysqli_query($link, $SQL);
+
+if($result){
+
+    echo"<div class='succesNotify'>
+    <i class='fa-solid fa-check'></i> Account created successfully!
+    </div>";
+}
+else
+{
+    echo"<div class='failedNotify'>
+    <i class='fa-solid fa-check'></i> Signup failed! Try again later.
+    </div>";
+}
+
+}
+    ?>
+
+
+    <form action="login.php" method="POST">
+        <h2> To Use The Library Management System, Kindly Login</h2>
+        
+
+        <div class="InputHolder">
+            
+            <select name="choosen_priviledge">
+                <option>- Click To Select Your Account Priviledge -</option><br>
+                <option>Admin</option><br>
+                <option>User</option><br>
+            </select>
+        </div>
+        
+        
+        <div class="InputHolder">
+            
+            <input type="email" name="email" placeholder="Email" required>
+        </div>
+
+        <div class="InputHolder">
+        
+            <input type="password" name="password"  id="password3" placeholder="Password" required>
+        </div>
+
+        <div class="specialBtn">
+            <span class="stayLeft"><label><input type="checkbox" name="showPW" unchecked onclick="SwitchPW()"> Show Password</label></span>
+            <span class="stayRight" onclick="showSignup()">New here? kindly Sign-up</span>
+        </div>
+
+        <div class="btnHolder">
+            <button name="login" type="submit">Secure Login<i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </form>        
+        
+    
+</div>
+    
+
+
+
+
+
+
+<div class="signUpFOrm">
+<h1>LIBRARY MANAGEMENT SYSTEM</h1><br>
+    <p>CHANGE YOUR TOMORROW THROUGH READING</p>
+
+    
+
+    <form action="index.php" method="POST">
+        <h2> Library User Sign Up Form</h2><br>
+        <div class="loginStatus">To create an account, carefully fill the form below</div>
+
+        <div class="InputHolder">
+    
+            <input type="text" name="fname"  id="fname" placeholder="Full name">
+        </div>
+
+        <div class="InputHolder">
+            
+            <input type="email" name="email"   id="email" placeholder="Email">
+        </div>
+
+        <div class="InputHolder">
+            
+            <select name="account_category"  id="account_category" >
+                <option>User</option>
+                <option>Admin</option>
+            </select>
+        </div>
+
+        <div class="InputHolder">
+            <input type="password" name="password" placeholder="Create password" id="password" >
+        </div>
+
+        <div class="InputHolder">
+            <input type="password" name="confirm_password"  id="confirm_password" placeholder="Confirm password" >
+        </div>
+
+        <div class="specialBtn">
+            <span class="stayLeft"><label><input type="checkbox" name="showPW" unchecked onclick="SwitchPW()"> Show Password</label></span>
+            <span class="stayRight" onclick="showLogin()">Already have account? Login</span>
+        </div>
+
+        <div class="btnHolder">
+            <button  name="signup"  type="submit">Create Account</button>
+        </div>
+
+
+        <input type="hidden" name="date_registered" value="<?php echo"$todays_date";?>"   id="date_registered" >
+        <input type="hidden" name="ipaddress" value="<?php echo"$ipaddress";?>"  id="ipaddress" >
+
+    </form>        
+</div>
+
+
+
+
+
+<script src="js/script.js"></script>
+<footer>
+<h2 style="text-align:center; color: green">To learn more about the website and the developer, click the link below</h2><br>
+<li><a href="about.html"> ABOUT <i class="fa-solid fa-right-from-bracket"></i></a></li><br>
+          <p style="text-align:center; color: green">This webpage was carefully designed by Mr Asadu Simeon Amuche </p1><br>
+           <P style="text-align:center; color: rgb(128, 119, 0)">All right reserved (c) 2025</P><br>
+</footer>
+</body>
+</html>
