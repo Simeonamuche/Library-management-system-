@@ -1,0 +1,188 @@
+<?php
+include("session.php");
+
+if (getenv('HTTP_X_FORWARDED_FOR')) {
+    $pipaddress = getenv('HTTP_X_FORWARDED_FOR');
+    $ipaddress = getenv('REMOTE_ADDR');
+
+} else {
+    $ipaddress = getenv('REMOTE_ADDR');
+   
+}
+
+    ?>
+	<?PHP 
+			  
+              $id = $_SESSION['id'];
+
+	  $SQL = "SELECT * FROM users WHERE user_id = '$id'";
+$result = mysqli_query($link, $SQL);
+		while ($db_field = mysqli_fetch_assoc($result)) {
+
+            
+            $loggedin_user_id = $db_field['user_id'];
+            $fname = $db_field['fname'];
+            $email = $db_field['email'];
+            $account_category = $db_field['account_category'];
+            
+            $date_registered = $db_field['date_registered'];
+            $ipaddress = $db_field['ipaddress'];
+        }
+            
+
+        $keyword_title = $_GET['keyword_title'];
+        $keyword_genre = $_GET['keyword_genre'];
+        $keyword_author = $_GET['keyword_author'];
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://kit.fontawesome.com/a71e118592.js" crossorigin="anonymous"></script>
+
+
+    <title>Search Book My Library Management System</title>
+</head>
+<body>
+
+
+    <!--- Site Navitation Started here--->
+
+    <div class="navigationBar">
+        <div class="logoArea">
+            <h2><a href="dashboard.php"> LIBRARY_MANAGEMENT <span>SYSTEM</span></a>
+            </h2>
+        </div>
+
+        <div class="menuArea">
+            <ul>
+                <li><a href="dashboard.php">DASHBOARD</a></li>
+                <li><a href="books.php">BOOKS</a></li>
+                <li><a href="my_borrowed_books.php">LOANS</a></li>
+                <li><a href="sign_out.php">LOG OUT</a></li>
+                <li><a href="about.html">ABOUT</a></li>
+            </ul>
+        </div>
+
+        <div class="mobileMenu" onclick="showMobilemenu()">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+
+        <div class="closeMenu" onclick="closeMobilemenu()">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+    </div>
+
+
+    <div class="mobileMenuTray">
+        <ul>
+            <li><a href="dashboard.php"> DASHBOARD</a></li>
+            <li><a href="books.php"> BOOKS </a></li>
+            <li><a href="my_borrowed_books.php"> LOANS </a></li>
+            <li><a href="sign_out.php"> LOG OUT </a></li>
+            <li><a href="about.html"> ABOUT </a></li> 
+        </ul>
+    </div>
+    <h2>CHANGE YOUR TOMORROW THROUGH READING</h2>
+
+    <!--- Navigation ended here--->
+
+
+<div class="pageArea">
+    <div class="greetingsTab">
+        
+
+        <div class="shortMenu">
+            <div class="formArea">
+                <form action="search_book.php" method="GET">
+                    <input type="text" name="keyword_title" placeholder="Search by book title" value="<?php echo"$keyword_title";?>">
+                    <input type="text" name="keyword_author" placeholder="Search by author"  value="<?php echo"$keyword_author";?>">
+                    <select name="keyword_genre">
+                        <?php echo"<option selected>$keyword_genre</option>";?>
+                        <option>History</option>
+                        <option>Fiction</option>
+                        <option>Comic</option>
+                    </select>
+                    <button type="submit" name="search"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+                </form>
+            </div>
+
+            
+        </div>
+    </div>
+
+    <div class="recentlyRead">
+
+    <?php
+    
+    $search_query=mysqli_query($link, "SELECT * FROM books_tb WHERE  book_title LIKE '$keyword_title' OR book_author LIKE '$keyword_author' OR book_genre LIKE '$keyword_genre' AND recycle='False'")or die(mysql_error());
+    $search_count = mysqli_num_rows($search_query);
+
+        
+if($search_count > 1){
+    
+    echo"<h2>$search_count books found matching $keyword_title ~ $keyword_author</h2>
+    <hr>";
+}
+else
+{
+    
+    echo"<h2>$search_count book found matching $keyword_title ~ $keyword_author</h2>
+    <hr>";
+}
+   
+
+        ?>
+       
+<?php
+    $SQL = "SELECT * FROM books_tb WHERE book_title LIKE '$keyword_title' OR book_author LIKE '$keyword_author' OR book_genre LIKE '$keyword_genre' AND recycle='False'";
+    $result = mysqli_query($link, $SQL);
+    while($db_field = mysqli_fetch_assoc($result)){
+    
+        
+        $book_id = $db_field['book_id'];
+        $book_title = $db_field['book_title'];
+        $book_author = $db_field['book_author'];
+        $book_genre = $db_field['book_genre'];
+        
+        $published_date = $db_field['published_date'];
+        $cover_image = $db_field['cover_image'];
+        $book_status = $db_field['book_status'];
+        $uploaded_by = $db_field['uploaded_by'];
+
+echo"<a href='view_book.php?book_id=$book_id'><div class='bookThumbnail'>
+<div class='bookCover'>
+    <img src='book_cover/$cover_image'>
+</div>
+<div class='detailPage'>
+    <h2>$book_title</h2>
+    <p><i class='fa-solid fa-user-pen'></i> Author: <span>$book_author</span></p>
+    <p><i class='fa-regular fa-clock'></i> Published year: <span>$published_date</span></p>
+    <div class='bookstatus'><i class='fa-solid fa-book-open-reader'></i> $book_status</div>
+</div>
+</div></a>";
+
+    
+}
+
+?>
+    </div>
+
+
+
+
+
+
+
+</div>
+    
+
+<script src="js/script.js"></script>
+<footer>
+                <p style="text-align:center; color: green">This webpage was carefully designed by Mr Asadu Simeon Amuche </p1><br>
+                <P style="text-align:center; color: rgb(128, 119, 0)">All right reserved (c) 2025</P><br>
+                </footer>
+</body>
+</html>
